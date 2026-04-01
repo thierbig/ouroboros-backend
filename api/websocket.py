@@ -98,7 +98,7 @@ async def agent_websocket(ws: WebSocket):
                 agent = Agent(
                     adapter=adapter,
                     registry=registry,
-                    max_iterations=25,
+                    max_iterations=100,
                     working_dir=working_dir,
                 )
 

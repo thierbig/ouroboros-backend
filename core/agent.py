@@ -19,7 +19,7 @@ class Agent:
         self,
         adapter: LLMAdapter,
         registry: ToolRegistry,
-        max_iterations: int = 25,
+        max_iterations: int = 100,
         working_dir: str | None = None,
     ):
         self.adapter = adapter
@@ -62,19 +62,10 @@ class Agent:
                 yield {"type": "response", "content": "Agent interrupted by user."}
                 break
 
-            # Budget warning injection
+            # Budget warning injection (as separate message, not mutating tool results)
             budget_warning = self._get_budget_warning(iteration)
-            if budget_warning and messages and messages[-1].get("role") == "tool":
-                content = messages[-1]["content"]
-                try:
-                    parsed = json.loads(content)
-                    if isinstance(parsed, dict):
-                        parsed["_budget_warning"] = budget_warning
-                        messages[-1]["content"] = json.dumps(parsed, ensure_ascii=False)
-                    else:
-                        messages[-1]["content"] = content + f"\n\n{budget_warning}"
-                except (json.JSONDecodeError, TypeError):
-                    messages[-1]["content"] = content + f"\n\n{budget_warning}"
+            if budget_warning:
+                messages.append({"role": "user", "content": budget_warning})
 
             # Emit status so frontend knows what's happening
             if iteration == 0:
