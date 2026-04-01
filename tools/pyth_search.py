@@ -1,4 +1,4 @@
-"""Search available Pyth Network price feeds via MCP server."""
+"""Search available Pyth Network price feeds."""
 
 import json
 
@@ -7,8 +7,7 @@ SCHEMA = {
     "description": (
         "Search available Pyth Network price feeds. "
         "Returns matching feeds with symbol, asset type, feed ID, and description. "
-        "Useful for discovering which assets are available on Pyth. "
-        "Powered by the official Pyth MCP Server."
+        "Useful for discovering which assets are available on Pyth."
     ),
     "parameters": {
         "type": "object",

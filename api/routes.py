@@ -165,22 +165,20 @@ async def create_project(body: dict = Body(...)):
 ### Frontend (Vite + React)
 - Scaffold: `bun create vite . --template react`
 - Use ethers.js or viem for contract interaction
-- **IMPORTANT: Use the Pyth MCP Server for ALL price data in the app.**
-  The MCP endpoint is `https://mcp.pyth.network/mcp` (JSON-RPC over HTTP).
-  See "Pyth MCP Integration" section below for how to call it from JavaScript.
+- **IMPORTANT: Use the Pyth Hermes REST API for ALL price data in the app.**
+  See "Pyth Hermes API Integration" section below for how to fetch prices from JavaScript.
 - Deploy frontend to Netlify
 
 ### Package Manager
 Always use `bun` (not npm/yarn).
 """
 
-    STACK_PRICE_GAME = """## Stack (Price Game — Vite Frontend + Pyth MCP Server)
+    STACK_PRICE_GAME = """## Stack (Price Game — Vite Frontend + Pyth Hermes API)
 
 ### Frontend (Vite + React)
 - Scaffold: `bun create vite . --template react`
-- **IMPORTANT: Use the Pyth MCP Server for ALL price data in the app.**
-  The MCP endpoint is `https://mcp.pyth.network/mcp` (JSON-RPC over HTTP).
-  See "Pyth MCP Integration" section below for how to call it from JavaScript.
+- **IMPORTANT: Use the Pyth Hermes REST API for ALL price data in the app.**
+  See "Pyth Hermes API Integration" section below for how to fetch prices from JavaScript.
 - Use `pyth_price`, `pyth_search`, `pyth_candles` tools to explore data while building
 - Deploy to Netlify
 
@@ -190,13 +188,13 @@ Always use `bun` (not npm/yarn).
 
     STACK_CUSTOM_GAME = """## Stack (Custom Game)
 - Ask the user which Pyth Network features they want to use:
-  - **Price Feeds**: Real-time asset prices via Pyth MCP Server
+  - **Price Feeds**: Real-time asset prices via Pyth Hermes REST API
   - **Entropy**: Verifiable on-chain randomness (requires Solidity + Foundry)
   - **Both**: Full-featured game with prices and randomness
 - Use `pyth_price`, `pyth_search`, `pyth_candles`, and `pyth_history` tools to explore available data
 - Use `pyth_deploy` tool to deploy Solidity contracts to Base Sepolia
-- **IMPORTANT: Use the Pyth MCP Server for ALL price data in deployed apps.**
-  See "Pyth MCP Integration" section below.
+- **IMPORTANT: Use the Pyth Hermes REST API for ALL price data in deployed apps.**
+  See "Pyth Hermes API Integration" section below.
 - For frontends, use Vite + React and deploy to Netlify
 - Use `bun` as package manager
 """
@@ -210,7 +208,7 @@ Always use `bun` (not npm/yarn).
 
     template_descriptions = {
         "entropy-game": "On-chain game using Pyth Entropy for verifiable randomness on Base Sepolia.",
-        "price-game": "Frontend game powered by real-time Pyth price feeds via Pyth MCP Server.",
+        "price-game": "Frontend game powered by real-time Pyth price feeds via Hermes REST API.",
         "custom-game": "Custom Pyth Network game — ask the user which features to use.",
     }
     project_desc = template_descriptions.get(template_id, template_descriptions["custom-game"])
@@ -223,55 +221,53 @@ Always use `bun` (not npm/yarn).
 
 {stack_section}
 
-## Pyth MCP Integration (for deployed apps)
+## Pyth Hermes API Integration (for deployed apps)
 
-**ALL price data in deployed apps MUST go through the Pyth MCP Server** at `https://mcp.pyth.network/mcp`.
-Do NOT use Hermes REST API directly. The MCP Server is the official Pyth integration method.
+**ALL price data in deployed apps MUST use the Pyth Hermes REST API** at `https://hermes.pyth.network`.
+The Hermes API supports CORS, requires no API key, and works directly in browsers.
 
-### How to call Pyth MCP from JavaScript:
+### How to fetch prices from JavaScript:
 
 ```javascript
-// Helper function — include this in your app
-async function pythMCP(toolName, args) {{
-  // Step 1: Initialize session
-  const init = await fetch('https://mcp.pyth.network/mcp', {{
-    method: 'POST',
-    headers: {{ 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' }},
-    body: JSON.stringify({{
-      jsonrpc: '2.0', id: 0, method: 'initialize',
-      params: {{ protocolVersion: '2024-11-05', capabilities: {{}}, clientInfo: {{ name: 'ouroboros-app', version: '1.0' }} }}
-    }})
-  }});
-  await init.json();
+// Common Pyth feed IDs
+const FEED_IDS = {{
+  'BTC/USD': 'e62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43',
+  'ETH/USD': 'ff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
+  'SOL/USD': 'ef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d',
+}};
 
-  // Step 2: Call the tool
-  const res = await fetch('https://mcp.pyth.network/mcp', {{
-    method: 'POST',
-    headers: {{ 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' }},
-    body: JSON.stringify({{
-      jsonrpc: '2.0', id: 1, method: 'tools/call',
-      params: {{ name: toolName, arguments: args }}
-    }})
-  }});
+// Fetch latest price
+async function getPythPrice(feedId) {{
+  const res = await fetch(`https://hermes.pyth.network/v2/updates/price/latest?ids[]=${{feedId}}`);
   const data = await res.json();
-  const text = data.result?.content?.[0]?.text || '';
-  return JSON.parse(text);
+  const price = data.parsed[0].price;
+  // price.price is a string, price.expo is negative exponent
+  // Actual price = parseInt(price.price) * 10^price.expo
+  return parseInt(price.price) * Math.pow(10, price.expo);
 }}
 
-// Usage examples:
-// Search feeds:     pythMCP('get_symbols', {{ query: 'bitcoin', limit: 5 }})
-// Get candles:      pythMCP('get_candlestick_data', {{ symbol: 'Crypto.BTC/USD', resolution: '60', from: ts - 86400, to: ts }})
-// Historical price: pythMCP('get_historical_price', {{ symbols: ['Crypto.BTC/USD'], timestamp: ts }})
+// Streaming prices (SSE) for real-time updates
+const evtSource = new EventSource(
+  `https://hermes.pyth.network/v2/updates/price/stream?ids[]=${{feedId}}`
+);
+evtSource.onmessage = (e) => {{
+  const data = JSON.parse(e.data);
+  const price = data.parsed[0].price;
+  const value = parseInt(price.price) * Math.pow(10, price.expo);
+  console.log('Live price:', value);
+}};
 ```
 
-### Available MCP tools (no API key needed):
-- `get_symbols` — search feeds by query/asset type
-- `get_candlestick_data` — OHLC candles (resolutions: 1, 5, 15, 30, 60, 120, 240, 360, 720, D, W, M)
-- `get_historical_price` — price at a specific timestamp
+### Hermes API endpoints (no API key needed):
+- **Latest price**: `GET /v2/updates/price/latest?ids[]=<feed_id>`
+- **Streaming (SSE)**: `GET /v2/updates/price/stream?ids[]=<feed_id>`
+- **Search feeds**: `GET /v2/price_feeds?query=<symbol>`
 
-### Common Pyth symbols:
-- `Crypto.BTC/USD`, `Crypto.ETH/USD`, `Crypto.SOL/USD`, `Crypto.DOGE/USD`
-- Use `get_symbols` to discover more
+### Common feed IDs:
+- BTC/USD: `e62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43`
+- ETH/USD: `ff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace`
+- SOL/USD: `ef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d`
+- Use `pyth_search` tool or `/v2/price_feeds?query=` to discover more
 
 ## Rules
 
