@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+demos/
+
+# Environment
+.env
+.env.*
+
+# Claude Code
+.claude/
+.debug/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Project demos (user-generated)
+demos/
+
+# HuggingFace model cache (downloaded at runtime)
+*.bin
+*.safetensors

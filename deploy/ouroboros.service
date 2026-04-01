@@ -1,0 +1,16 @@
+[Unit]
+Description=Ouroboros Agent API
+After=network.target
+
+[Service]
+User=ouroboros
+Group=ouroboros
+WorkingDirectory=/opt/ouroboros-backend
+Environment="PATH=/opt/ouroboros-backend/venv/bin:/usr/bin"
+EnvironmentFile=/opt/ouroboros-backend/.env
+ExecStart=/opt/ouroboros-backend/venv/bin/uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
