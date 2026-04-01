@@ -69,9 +69,9 @@ class Agent:
 
             # Emit status so frontend knows what's happening
             if iteration == 0:
-                yield {"type": "status", "message": "Thinking..."}
+                yield {"type": "status", "message": "Thinking...", "iteration": iteration + 1, "max_iterations": self.max_iterations}
             else:
-                yield {"type": "status", "message": f"Thinking... (turn {iteration + 1})"}
+                yield {"type": "status", "message": f"Thinking... (turn {iteration + 1})", "iteration": iteration + 1, "max_iterations": self.max_iterations}
 
             # Call LLM (with retry on timeout)
             try:
