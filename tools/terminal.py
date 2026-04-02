@@ -35,7 +35,9 @@ SCHEMA = {
         "IMPORTANT: Commands run non-interactively (no stdin). Always use "
         "non-interactive flags: --yes, -y, --no-input, --default, etc. "
         "Use `bun` (not npm/yarn) for all JS/TS work. "
-        "Use timeout to prevent long-running commands from blocking."
+        "Use timeout to prevent long-running commands from blocking. "
+        "Commands run in your project directory. NEVER create files or "
+        "directories outside your project folder."
     ),
     "parameters": {
         "type": "object",
@@ -92,6 +94,13 @@ _SECRET_CMDS = re.compile(
     re.IGNORECASE,
 )
 
+# Block commands that try to escape the project sandbox via path traversal
+_ESCAPE_CMDS = re.compile(
+    r"(mkdir|touch|cp|mv|ln|tee|>\s*)\s+[\"']?\.\./|"  # writing to ../
+    r"\bcd\s+\.\.",                                       # cd ..
+    re.IGNORECASE,
+)
+
 
 def handle(args: dict, working_dir: str | None = None) -> str:
     command = args["command"]
@@ -102,8 +111,19 @@ def handle(args: dict, working_dir: str | None = None) -> str:
             "exit_code": 1,
             "error": "Command blocked by security policy",
         })
+    if working_dir and _ESCAPE_CMDS.search(command):
+        return json.dumps({
+            "output": "",
+            "stderr": "Blocked: command attempts to escape the project directory",
+            "exit_code": 1,
+            "error": "Sandbox violation: stay inside your project directory",
+        })
     timeout = args.get("timeout", 180)
-    workdir = working_dir or args.get("workdir", None)
+    # Always use the sandbox working_dir — ignore user-supplied workdir to
+    # prevent the agent from escaping its project directory.
+    workdir = working_dir
+    if not workdir:
+        workdir = args.get("workdir", None)
 
     env = os.environ.copy()
     # Force non-interactive mode — but NOT CI=true which breaks create-vite/scaffolders

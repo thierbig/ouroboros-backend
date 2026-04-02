@@ -462,6 +462,9 @@ def _is_sensitive(path: str) -> bool:
 
 @router.get("/files/{path:path}")
 async def read_file(path: str):
+    # FastAPI strips the leading '/' from absolute paths — restore it
+    if not Path(path).is_absolute() and path.startswith("app/"):
+        path = "/" + path
     if _is_sensitive(path):
         raise HTTPException(status_code=403, detail="Access denied: sensitive file")
     try:
@@ -477,6 +480,8 @@ async def read_file(path: str):
 @router.get("/files-raw/{path:path}")
 async def read_file_raw(path: str):
     """Serve a file as raw bytes (for images)."""
+    if not Path(path).is_absolute() and path.startswith("app/"):
+        path = "/" + path
     if _is_sensitive(path):
         raise HTTPException(status_code=403, detail="Access denied: sensitive file")
     from fastapi.responses import FileResponse

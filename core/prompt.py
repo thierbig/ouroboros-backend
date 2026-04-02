@@ -135,7 +135,14 @@ def build_system_prompt(working_dir: str | None = None) -> str:
     parts = [AGENT_IDENTITY, SECURITY_RULES, TOOL_GUIDANCE, ERROR_RECOVERY, DEPLOY_GUIDANCE]
 
     if working_dir:
-        parts.append(f"\n## Working Directory\nYou are operating in: {working_dir}")
+        parts.append(
+            f"\n## Working Directory (SANDBOXED)\n"
+            f"You are operating in: {working_dir}\n"
+            f"You are STRICTLY confined to this directory. ALL files you create, read, or modify "
+            f"MUST be inside this directory. NEVER use `cd ..`, `mkdir` outside this directory, "
+            f"or write files to parent/sibling directories. Every path you use must be relative "
+            f"to or inside your working directory."
+        )
 
         # Inject CLAUDE.md — project-specific instructions
         claude_md = _read_project_file(working_dir, "CLAUDE.md")
