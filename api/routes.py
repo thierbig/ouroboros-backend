@@ -491,6 +491,87 @@ async def read_file_raw(path: str):
     return FileResponse(file_path)
 
 
+@router.get("/showcase/projects")
+async def showcase_projects():
+    """Public list of projects that have been deployed. No code paths exposed."""
+    projects_path = Path(PROJECTS_DIR)
+    if not projects_path.exists():
+        return []
+    out = []
+    for entry in sorted(projects_path.iterdir()):
+        if not entry.is_dir() or entry.name.startswith("."):
+            continue
+        deploy_url = _detect_deploy_url(entry)
+        if not deploy_url:
+            continue
+        deploy_session_id = await _find_deploy_session(str(entry.resolve()), deploy_url)
+
+        project_type = "price-game"
+        claude_md = entry / "CLAUDE.md"
+        if claude_md.exists():
+            try:
+                content = claude_md.read_text(encoding="utf-8", errors="replace")
+                if "Entropy" in content or "IEntropyConsumer" in content:
+                    project_type = "entropy-game"
+                elif "Custom Game" in content:
+                    project_type = "custom-game"
+            except Exception:
+                pass
+
+        out.append({
+            "id": entry.name,
+            "name": entry.name.replace("-", " ").title(),
+            "deploy_url": deploy_url,
+            "deploy_session_id": deploy_session_id,
+            "project_type": project_type,
+        })
+    return out
+
+
+def _project_dir_for_session(working_dir: str) -> Path | None:
+    """Return the project directory if `working_dir` is a project under PROJECTS_DIR."""
+    if not working_dir:
+        return None
+    try:
+        wd = Path(working_dir).resolve()
+        root = Path(PROJECTS_DIR).resolve()
+        if wd == root or root not in wd.parents:
+            return None
+        # The project dir is the immediate child of PROJECTS_DIR
+        rel = wd.relative_to(root)
+        first = rel.parts[0] if rel.parts else None
+        if not first:
+            return None
+        return root / first
+    except Exception:
+        return None
+
+
+@router.get("/showcase/sessions/{session_id}")
+async def showcase_get_session(session_id: str):
+    """Public read-only session view, gated to projects that have a deploy URL."""
+    session = await get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    project_dir = _project_dir_for_session(session.get("working_dir", ""))
+    if not project_dir or not project_dir.exists() or not _detect_deploy_url(project_dir):
+        raise HTTPException(status_code=404, detail="Session not available")
+    return serialize_doc(session)
+
+
+@router.get("/showcase/sessions/{session_id}/chunks")
+async def showcase_get_chunks(session_id: str):
+    """Public read-only chunks for a showcase session."""
+    session = await get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    project_dir = _project_dir_for_session(session.get("working_dir", ""))
+    if not project_dir or not project_dir.exists() or not _detect_deploy_url(project_dir):
+        raise HTTPException(status_code=404, detail="Session not available")
+    chunks = await get_chunks_for_session(session_id)
+    return [serialize_doc(c) for c in chunks]
+
+
 @router.get("/admin/sessions")
 async def admin_list_sessions():
     sessions = await list_sessions()

@@ -1,0 +1,358 @@
+{
+  "session": {
+    "_id": "69cc5d252447cfb1b234d422",
+    "created_at": "2026-03-31T23:47:49.087000",
+    "last_activity": "2026-03-31T23:51:05.546000",
+    "status": "completed",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-20250514",
+    "working_dir": "C:\\Users\\thier\\ouroboros-backend\\demos\\e2e-test-1775000861029",
+    "total_tokens": 25076,
+    "total_cost": 0.080952,
+    "messages": [
+      {
+        "role": "user",
+        "content": "Let's build a Coin Flip game!",
+        "timestamp": "2026-03-31T23:47:49.111858+00:00"
+      },
+      {
+        "role": "assistant",
+        "content": "Great! A Coin Flip game is a perfect fit for Pyth Entropy - we can use verifiable randomness to ensure fair outcomes. Let me ask a few quick questions to understand what you want:\n\n1. **Game mechanics**: How should it work? \n   - Players bet ETH and choose heads/tails?\n   - What happens when they win/lose?\n   - Any specific payout ratio? (e.g., 2x their bet for correct guess?)\n\n2. **Frontend features**: What should players see?\n   - Simple bet amount input + heads/tails buttons?\n   - Game history?\n   - Current balance display?\n\n3. **Any specific styling or theme** you have in mind, or should I keep it clean and simple?\n\nOnce I know these details, I'll build the Solidity contract using Pyth Entropy for true randomness, deploy it to Base Sepolia, create a React frontend, and get it live on Netlify for you to try!",
+        "timestamp": "2026-03-31T23:47:55.839316+00:00"
+      },
+      {
+        "role": "user",
+        "content": "ETH with variable amounts. Double the bet if you win. Keep it simple and just build it!",
+        "timestamp": "2026-03-31T23:47:56.476468+00:00"
+      },
+      {
+        "role": "assistant",
+        "content": "Perfect! I'll build a simple ETH coin flip game with 2x payouts using Pyth Entropy for verifiable randomness. Let me start by setting up the project structure.",
+        "timestamp": "2026-03-31T23:47:58.797253+00:00",
+        "tool_calls": [
+          {
+            "id": "toolu_01Ukshugpqwta4AmnFHh2NZQ",
+            "type": "function",
+            "function": {
+              "name": "terminal",
+              "arguments": "{\"command\": \"ls -la\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "content": "{\"output\": \"total 8\\ndrwxrwxrwx 1 pstar pstar 4096 Mar 31 19:47 .\\ndrwxrwxrwx 1 pstar pstar 4096 Mar 31 19:47 ..\\n-rwxrwxrwx 1 pstar pstar 4279 Mar 31 19:47 CLAUDE.md\\ndrwxrwxrwx 1 pstar pstar 4096 Mar 31 19:47 tasks\\n\", \"stderr\": \"\", \"exit_code\": 0, \"error\": null}",
+        "tool_call_id": "toolu_01Ukshugpqwta4AmnFHh2NZQ",
+        "timestamp": "2026-03-31T23:47:59.302309+00:00"
+      },
+      {
+        "role": "assistant",
+        "content": "Great! Starting with a clean directory. Let me set up the Foundry project first for the smart contract:",
+        "timestamp": "2026-03-31T23:48:01.371882+00:00",
+        "tool_calls": [
+          {
+            "id": "toolu_01HNQFXmdN6yqQEDo5rrt2LE",
+            "type": "function",
+            "function": {
+              "name": "terminal",
+              "arguments": "{\"command\": \"forge init --no-git --force\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "content": "{\"output\": \"Initializing /mnt/c/Users/thier/ouroboros-backend/demos/e2e-test-1775000861029...\\nInstalling forge-std in /mnt/c/Users/thier/ouroboros-backend/demos/e2e-test-1775000861029/lib/forge-std (url: https://github.com/foundry-rs/forge-std, tag: None)\\n    Installed forge-std\\n    Initialized forge project\\n\", \"stderr\": \"Warning: Target directory is not empty, but `--force` was specified\\nCloning into '/mnt/c/Users/thier/ouroboros-backend/demos/e2e-test-1775000861029/lib/forge-std'...\\n\", \"exit_code\": 0, \"error\": null}",
+        "tool_call_id": "toolu_01HNQFXmdN6yqQEDo5rrt2LE",
+        "timestamp": "2026-03-31T23:48:03.570585+00:00"
+      },
+      {
+        "role": "assistant",
+        "content": "Now let me install the Pyth SDK for Entropy:",
+        "timestamp": "2026-03-31T23:48:05.444246+00:00",
+        "tool_calls": [
+          {
+            "id": "toolu_01JnhxjEMXygXy7juQTn8wF7",
+            "type": "function",
+            "function": {
+              "name": "terminal",
+              "arguments": "{\"command\": \"forge install pythnet/pyth-crosschain --no-git\"}"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "chunks": [
+    {
+      "_id": "69cc5d2b2447cfb1b234d424",
+      "session_id": "69cc5d252447cfb1b234d422",
+      "chunk_index": 1,
+      "created_at": "2026-03-31T23:47:55.791000",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "prompt": [
+        {
+          "role": "system",
+          "content": "You are Ouroboros, an autonomous coding agent specialized in building mini games powered by Pyth Network. You help users create on-chain games using Pyth Price Feeds and Pyth Entropy (verifiable randomness). You deploy to Base Sepolia and build frontends that integrate with Pyth's MCP Server. You are direct, efficient, and focused on solving the task at hand.\n\n\n## Tool Usage Guidelines\n\n- **read_file**: Always read a file before editing it. Use offset/limit for large files.\n- **write_file**: Use for creating new files. For editing existing files, prefer patch.\n- **patch**: Use old_string/new_string for targeted edits. Include enough context for uniqueness.\n- **terminal**: Use for running commands (install, test, build, forge). Check exit codes. Commands run non-interactively (no stdin) \u2014 ALWAYS use non-interactive flags (-y, --yes, --default). Use `bun` (not npm/yarn). Commands run in Linux (WSL). CRITICAL RULES:\n  - Just pass raw commands (e.g. `bun install`). NEVER wrap in `powershell -c`, `cmd /c`, etc.\n  - Use Unix syntax only (`curl`, `ls`, `cat`, `&&`, `||`, `$VAR`).\n  - When scaffolding with `bun create vite`, the directory MUST be empty. Use `rm -rf .[!.]* * 2>/dev/null` to clear everything including dotfiles. Do NOT run `bun init` before `bun create vite`.\n  - NEVER run `bun init` followed by `bun create vite` \u2014 pick one approach.\n- **search_files**: Use to find code or files before editing. Prefer content search for code, file search for locating files.\n- **pyth_price**: Fetch real-time asset prices from Pyth Network. Pass a symbol like \"BTC/USD\" or \"SOL\". Shows price, confidence, EMA, and feed metadata.\n- **pyth_search**: Discover available Pyth price feeds. Search by name, symbol, or asset type. Returns feed IDs needed for on-chain integration. Powered by Pyth MCP Server.\n- **pyth_history**: Get historical prices at a specific point in time. Pass symbols and a Unix timestamp. Powered by Pyth MCP Server.\n- **pyth_candles**: Fetch OHLC candlestick data for charting. Supports 1min to monthly resolution. Powered by Pyth MCP Server.\n- **pyth_deploy**: Compile and deploy Solidity contracts to Base Sepolia with Foundry. Returns deployed address and BaseScan explorer link.\n\n## Pyth Integration Guide\n\n### Price Feeds \u2014 Agent Tools vs Browser Apps\n- Use `pyth_price`, `pyth_search`, `pyth_candles`, `pyth_history` tools to look up prices during development\n- **CRITICAL: Browser/frontend apps CANNOT call the MCP server** (`mcp.pyth.network/mcp`) \u2014 it does not support CORS\n- **Deployed frontend apps MUST use the Hermes REST API** for live price data:\n  - Latest price: `https://hermes.pyth.network/v2/updates/price/latest?ids[]=<feed_id>`\n  - Streaming (SSE): `https://hermes.pyth.network/v2/updates/price/stream?ids[]=<feed_id>`\n  - Response contains `parsed[0].price.price` (price as string) and `parsed[0].price.expo` (exponent)\n  - Actual price = `parseInt(price) * 10^expo` (e.g. price=\"6835000000000\", expo=-8 \u2192 $68,350.00)\n  - The Hermes API supports CORS and requires no API key\n- For on-chain price verification, use `@pythnetwork/pyth-sdk-solidity`\n\n### Entropy (Verifiable Randomness) on Base Sepolia\n- Entropy contract: `0x4821932D0CDd71225A6d914706A621e0389D7061`\n- Use `@pythnetwork/entropy-sdk-solidity` for Solidity integration\n- Flow: user requests randomness \u2192 callback delivers random number\n- Your contract must implement `IEntropyConsumer` interface\n- Install: `forge install pythnet/pyth-crosschain` (provides the SDK)\n\n### Common Feed IDs\n- BTC/USD: `0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43`\n- ETH/USD: `0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace`\n- SOL/USD: `0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d`\n\n## Workflow\n1. **Start by asking the user what they need** \u2014 don't search or read files until you know the task\n2. For new projects, ask questions one at a time to understand requirements before writing code\n3. For existing projects, read the relevant source files to understand what exists\n4. Plan your approach \u2014 think before acting\n5. Make changes \u2014 use patch for edits, write_file for new files\n6. Verify \u2014 run tests or check the result with terminal\n7. Report \u2014 summarize what you did and any issues\n\n**Do NOT** search or list files as your first action. Talk to the user first.\n\n\n\n## Error Recovery (CRITICAL)\nWhen a tool returns an error (especially terminal stderr), you MUST:\n1. Analyze the error message carefully\n2. Try a different approach immediately \u2014 do NOT stop or ask the user\n3. Keep trying until it works or you've exhausted at least 3 different approaches\n4. NEVER give up on a task mid-way. If the user asked you to deploy, keep trying until deployed.\n5. If a command times out, try a simpler/faster alternative\n6. If a command hangs waiting for input, add non-interactive flags (--yes, -y, --no-input)\n7. NEVER fall back from `bun` to `npm` or `yarn`. `bun` is always available.\n\nIMPORTANT: Do NOT send a text-only response (which ends your turn) while a task is incomplete.\nKeep using tools until the task is fully done. Only send a final text response when the task is complete or you have genuinely exhausted all options after 3+ attempts.\n\n\n\n## Deployment (Netlify)\nIMPORTANT: Use `npx netlify-cli` for Netlify commands (NOT bunx \u2014 it's broken with netlify-cli).\nUse `bun` for everything else (install, build, etc.).\n\nWhen the user asks you to deploy their project or see a live result:\n1. **Build the project** first \u2014 `bun run build`\n2. **Create a Netlify site** if one doesn't exist yet:\n   ```\n   npx netlify-cli sites:create --name=<project-name> --account-slug=$NETLIFY_ACCOUNT_SLUG --auth=$NETLIFY_AUTH_TOKEN\n   ```\n3. **Set environment variables on Netlify** if the project uses a database:\n   ```\n   npx netlify-cli env:set MONGODB_URI \"$MONGODB_URI\" --scope functions --site=<site-name> --auth=$NETLIFY_AUTH_TOKEN\n   ```\n4. **Deploy to Netlify**:\n   ```\n   npx netlify-cli deploy --prod --dir=<build-output-dir> --site=<site-name> --auth=$NETLIFY_AUTH_TOKEN\n   ```\n   - Common build output dirs: `dist/`, `build/`, `.output/public/`, `.next/`\n   - NETLIFY_AUTH_TOKEN and NETLIFY_ACCOUNT_SLUG are available as env vars\n5. **Report the live URL** back to the user after deployment succeeds\n6. If deployment fails, fix the errors and retry \u2014 NEVER fall back to \"manual deployment instructions\" or alternative platforms (Vercel, surge, etc). Netlify is the only deployment target.\n\n\n\n## Working Directory\nYou are operating in: C:\\Users\\thier\\ouroboros-backend\\demos\\e2e-test-1775000861029\n\n\n## Project Instructions (CLAUDE.md)\nThe following are project-specific instructions set by the developer. Follow these closely:\n\n# E2E Test 1775000861029\n\n## Project Context\nOn-chain game using Pyth Entropy for verifiable randomness on Base Sepolia.\n\n## Stack (Entropy Game \u2014 Solidity + Foundry + Pyth Entropy)\n\n### Smart Contract (Foundry)\n- Use Foundry (forge) for Solidity development\n- Install Pyth SDK: `forge install pythnet/pyth-crosschain`\n- Your contract must implement `IEntropyConsumer` for verifiable randomness\n- Pyth Entropy on Base Sepolia: `0x4821932D0CDd71225A6d914706A621e0389D7061`\n- Deploy with the `pyth_deploy` tool (compiles + deploys to Base Sepolia)\n\n### Frontend (Vite + React)\n- Scaffold: `bun create vite . --template react`\n- Use ethers.js or viem for contract interaction\n- **IMPORTANT: Use the Pyth MCP Server for ALL price data in the app.**\n  The MCP endpoint is `https://mcp.pyth.network/mcp` (JSON-RPC over HTTP).\n  See \"Pyth MCP Integration\" section below for how to call it from JavaScript.\n- Deploy frontend to Netlify\n\n### Package Manager\nAlways use `bun` (not npm/yarn).\n\n\n## Pyth MCP Integration (for deployed apps)\n\n**ALL price data in deployed apps MUST go through the Pyth MCP Server** at `https://mcp.pyth.network/mcp`.\nDo NOT use Hermes REST API directly. The MCP Server is the official Pyth integration method.\n\n### How to call Pyth MCP from JavaScript:\n\n```javascript\n// Helper function \u2014 include this in your app\nasync function pythMCP(toolName, args) {\n  // Step 1: Initialize session\n  const init = await fetch('https://mcp.pyth.network/mcp', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },\n    body: JSON.stringify({\n      jsonrpc: '2.0', id: 0, method: 'initialize',\n      params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'ouroboros-app', version: '1.0' } }\n    })\n  });\n  await init.json();\n\n  // Step 2: Call the tool\n  const res = await fetch('https://mcp.pyth.network/mcp', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },\n    body: JSON.stringify({\n      jsonrpc: '2.0', id: 1, method: 'tools/call',\n      params: { name: toolName, arguments: args }\n    })\n  });\n  const data = await res.json();\n  const text = data.result?.content?.[0]?.text || '';\n  return JSON.parse(text);\n}\n\n// Usage examples:\n// Search feeds:     pythMCP('get_symbols', { query: 'bitcoin', limit: 5 })\n// Get candles:      pythMCP('get_candlestick_data', { symbol: 'Crypto.BTC/USD', resolution: '60', from: ts - 86400, to: ts })\n// Historical price: pythMCP('get_historical_price', { symbols: ['Crypto.BTC/USD'], timestamp: ts })\n```\n\n### Available MCP tools (no API key needed):\n- `get_symbols` \u2014 search feeds by query/asset type\n- `get_candlestick_data` \u2014 OHLC candles (resolutions: 1, 5, 15, 30, 60, 120, 240, 360, 720, D, W, M)\n- `get_historical_price` \u2014 price at a specific timestamp\n\n### Common Pyth symbols:\n- `Crypto.BTC/USD`, `Crypto.ETH/USD`, `Crypto.SOL/USD`, `Crypto.DOGE/USD`\n- Use `get_symbols` to discover more\n\n## Rules\n\n### 1. Talk First, Code Second\n- Ask the user questions one at a time to understand what they want\n- Do NOT search files or read task files as your first action\n- Once requirements are clear, then start building\n\n### 2. Auto-Deploy\n- After building a web project, ALWAYS deploy it to Netlify automatically \u2014 do NOT ask the user\n- Build first, then deploy immediately. The user wants to see it live.\n\n### 3. Verify Before Done\n- Never say you're done without proving it works\n- Run the code, check for errors, test the output\n- If something breaks, fix it yourself \u2014 don't ask the user how\n\n### 4. Keep It Simple\n- Make every change as simple as possible\n- No over-engineering \u2014 build what was asked for\n- Find root causes, no temporary fixes\n\n### 5. Autonomous Execution\n- When given a task: just do it. Don't ask for hand-holding\n- Read the relevant code, make the changes, verify they work\n- Only ask the user when there's a genuine ambiguity or choice to make\n\n### 6. Quality Standards\n- Read existing code before editing\n- Use `patch` for edits, `write_file` for new files\n- Check terminal exit codes \u2014 fix errors before moving on\n\n\n## Current Time\n2026-03-31 23:47 UTC"
+        },
+        {
+          "role": "user",
+          "content": "Let's build a Coin Flip game!",
+          "timestamp": "2026-03-31T23:47:49.111858+00:00"
+        }
+      ],
+      "prompt_tokens": 5762,
+      "prompt_size_kb": 11.12,
+      "response": {
+        "content": "Great! A Coin Flip game is a perfect fit for Pyth Entropy - we can use verifiable randomness to ensure fair outcomes. Let me ask a few quick questions to understand what you want:\n\n1. **Game mechanics**: How should it work? \n   - Players bet ETH and choose heads/tails?\n   - What happens when they win/lose?\n   - Any specific payout ratio? (e.g., 2x their bet for correct guess?)\n\n2. **Frontend features**: What should players see?\n   - Simple bet amount input + heads/tails buttons?\n   - Game history?\n   - Current balance display?\n\n3. **Any specific styling or theme** you have in mind, or should I keep it clean and simple?\n\nOnce I know these details, I'll build the Solidity contract using Pyth Entropy for true randomness, deploy it to Base Sepolia, create a React frontend, and get it live on Netlify for you to try!",
+        "tool_calls": []
+      },
+      "response_tokens": 223,
+      "response_size_kb": 0.85,
+      "total_tokens": 5985,
+      "cost": 0.020631,
+      "latency_ms": 6679,
+      "tool_calls": [],
+      "status": "ok",
+      "error": null
+    },
+    {
+      "_id": "69cc5d2e2447cfb1b234d425",
+      "session_id": "69cc5d252447cfb1b234d422",
+      "chunk_index": 2,
+      "created_at": "2026-03-31T23:47:58.749000",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "prompt": [
+        {
+          "role": "system",
+          "content": "You are Ouroboros, an autonomous coding agent specialized in building mini games powered by Pyth Network. You help users create on-chain games using Pyth Price Feeds and Pyth Entropy (verifiable randomness). You deploy to Base Sepolia and build frontends that integrate with Pyth's MCP Server. You are direct, efficient, and focused on solving the task at hand.\n\n\n## Tool Usage Guidelines\n\n- **read_file**: Always read a file before editing it. Use offset/limit for large files.\n- **write_file**: Use for creating new files. For editing existing files, prefer patch.\n- **patch**: Use old_string/new_string for targeted edits. Include enough context for uniqueness.\n- **terminal**: Use for running commands (install, test, build, forge). Check exit codes. Commands run non-interactively (no stdin) \u2014 ALWAYS use non-interactive flags (-y, --yes, --default). Use `bun` (not npm/yarn). Commands run in Linux (WSL). CRITICAL RULES:\n  - Just pass raw commands (e.g. `bun install`). NEVER wrap in `powershell -c`, `cmd /c`, etc.\n  - Use Unix syntax only (`curl`, `ls`, `cat`, `&&`, `||`, `$VAR`).\n  - When scaffolding with `bun create vite`, the directory MUST be empty. Use `rm -rf .[!.]* * 2>/dev/null` to clear everything including dotfiles. Do NOT run `bun init` before `bun create vite`.\n  - NEVER run `bun init` followed by `bun create vite` \u2014 pick one approach.\n- **search_files**: Use to find code or files before editing. Prefer content search for code, file search for locating files.\n- **pyth_price**: Fetch real-time asset prices from Pyth Network. Pass a symbol like \"BTC/USD\" or \"SOL\". Shows price, confidence, EMA, and feed metadata.\n- **pyth_search**: Discover available Pyth price feeds. Search by name, symbol, or asset type. Returns feed IDs needed for on-chain integration. Powered by Pyth MCP Server.\n- **pyth_history**: Get historical prices at a specific point in time. Pass symbols and a Unix timestamp. Powered by Pyth MCP Server.\n- **pyth_candles**: Fetch OHLC candlestick data for charting. Supports 1min to monthly resolution. Powered by Pyth MCP Server.\n- **pyth_deploy**: Compile and deploy Solidity contracts to Base Sepolia with Foundry. Returns deployed address and BaseScan explorer link.\n\n## Pyth Integration Guide\n\n### Price Feeds \u2014 Agent Tools vs Browser Apps\n- Use `pyth_price`, `pyth_search`, `pyth_candles`, `pyth_history` tools to look up prices during development\n- **CRITICAL: Browser/frontend apps CANNOT call the MCP server** (`mcp.pyth.network/mcp`) \u2014 it does not support CORS\n- **Deployed frontend apps MUST use the Hermes REST API** for live price data:\n  - Latest price: `https://hermes.pyth.network/v2/updates/price/latest?ids[]=<feed_id>`\n  - Streaming (SSE): `https://hermes.pyth.network/v2/updates/price/stream?ids[]=<feed_id>`\n  - Response contains `parsed[0].price.price` (price as string) and `parsed[0].price.expo` (exponent)\n  - Actual price = `parseInt(price) * 10^expo` (e.g. price=\"6835000000000\", expo=-8 \u2192 $68,350.00)\n  - The Hermes API supports CORS and requires no API key\n- For on-chain price verification, use `@pythnetwork/pyth-sdk-solidity`\n\n### Entropy (Verifiable Randomness) on Base Sepolia\n- Entropy contract: `0x4821932D0CDd71225A6d914706A621e0389D7061`\n- Use `@pythnetwork/entropy-sdk-solidity` for Solidity integration\n- Flow: user requests randomness \u2192 callback delivers random number\n- Your contract must implement `IEntropyConsumer` interface\n- Install: `forge install pythnet/pyth-crosschain` (provides the SDK)\n\n### Common Feed IDs\n- BTC/USD: `0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43`\n- ETH/USD: `0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace`\n- SOL/USD: `0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d`\n\n## Workflow\n1. **Start by asking the user what they need** \u2014 don't search or read files until you know the task\n2. For new projects, ask questions one at a time to understand requirements before writing code\n3. For existing projects, read the relevant source files to understand what exists\n4. Plan your approach \u2014 think before acting\n5. Make changes \u2014 use patch for edits, write_file for new files\n6. Verify \u2014 run tests or check the result with terminal\n7. Report \u2014 summarize what you did and any issues\n\n**Do NOT** search or list files as your first action. Talk to the user first.\n\n\n\n## Error Recovery (CRITICAL)\nWhen a tool returns an error (especially terminal stderr), you MUST:\n1. Analyze the error message carefully\n2. Try a different approach immediately \u2014 do NOT stop or ask the user\n3. Keep trying until it works or you've exhausted at least 3 different approaches\n4. NEVER give up on a task mid-way. If the user asked you to deploy, keep trying until deployed.\n5. If a command times out, try a simpler/faster alternative\n6. If a command hangs waiting for input, add non-interactive flags (--yes, -y, --no-input)\n7. NEVER fall back from `bun` to `npm` or `yarn`. `bun` is always available.\n\nIMPORTANT: Do NOT send a text-only response (which ends your turn) while a task is incomplete.\nKeep using tools until the task is fully done. Only send a final text response when the task is complete or you have genuinely exhausted all options after 3+ attempts.\n\n\n\n## Deployment (Netlify)\nIMPORTANT: Use `npx netlify-cli` for Netlify commands (NOT bunx \u2014 it's broken with netlify-cli).\nUse `bun` for everything else (install, build, etc.).\n\nWhen the user asks you to deploy their project or see a live result:\n1. **Build the project** first \u2014 `bun run build`\n2. **Create a Netlify site** if one doesn't exist yet:\n   ```\n   npx netlify-cli sites:create --name=<project-name> --account-slug=$NETLIFY_ACCOUNT_SLUG --auth=$NETLIFY_AUTH_TOKEN\n   ```\n3. **Set environment variables on Netlify** if the project uses a database:\n   ```\n   npx netlify-cli env:set MONGODB_URI \"$MONGODB_URI\" --scope functions --site=<site-name> --auth=$NETLIFY_AUTH_TOKEN\n   ```\n4. **Deploy to Netlify**:\n   ```\n   npx netlify-cli deploy --prod --dir=<build-output-dir> --site=<site-name> --auth=$NETLIFY_AUTH_TOKEN\n   ```\n   - Common build output dirs: `dist/`, `build/`, `.output/public/`, `.next/`\n   - NETLIFY_AUTH_TOKEN and NETLIFY_ACCOUNT_SLUG are available as env vars\n5. **Report the live URL** back to the user after deployment succeeds\n6. If deployment fails, fix the errors and retry \u2014 NEVER fall back to \"manual deployment instructions\" or alternative platforms (Vercel, surge, etc). Netlify is the only deployment target.\n\n\n\n## Working Directory\nYou are operating in: C:\\Users\\thier\\ouroboros-backend\\demos\\e2e-test-1775000861029\n\n\n## Project Instructions (CLAUDE.md)\nThe following are project-specific instructions set by the developer. Follow these closely:\n\n# E2E Test 1775000861029\n\n## Project Context\nOn-chain game using Pyth Entropy for verifiable randomness on Base Sepolia.\n\n## Stack (Entropy Game \u2014 Solidity + Foundry + Pyth Entropy)\n\n### Smart Contract (Foundry)\n- Use Foundry (forge) for Solidity development\n- Install Pyth SDK: `forge install pythnet/pyth-crosschain`\n- Your contract must implement `IEntropyConsumer` for verifiable randomness\n- Pyth Entropy on Base Sepolia: `0x4821932D0CDd71225A6d914706A621e0389D7061`\n- Deploy with the `pyth_deploy` tool (compiles + deploys to Base Sepolia)\n\n### Frontend (Vite + React)\n- Scaffold: `bun create vite . --template react`\n- Use ethers.js or viem for contract interaction\n- **IMPORTANT: Use the Pyth MCP Server for ALL price data in the app.**\n  The MCP endpoint is `https://mcp.pyth.network/mcp` (JSON-RPC over HTTP).\n  See \"Pyth MCP Integration\" section below for how to call it from JavaScript.\n- Deploy frontend to Netlify\n\n### Package Manager\nAlways use `bun` (not npm/yarn).\n\n\n## Pyth MCP Integration (for deployed apps)\n\n**ALL price data in deployed apps MUST go through the Pyth MCP Server** at `https://mcp.pyth.network/mcp`.\nDo NOT use Hermes REST API directly. The MCP Server is the official Pyth integration method.\n\n### How to call Pyth MCP from JavaScript:\n\n```javascript\n// Helper function \u2014 include this in your app\nasync function pythMCP(toolName, args) {\n  // Step 1: Initialize session\n  const init = await fetch('https://mcp.pyth.network/mcp', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },\n    body: JSON.stringify({\n      jsonrpc: '2.0', id: 0, method: 'initialize',\n      params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'ouroboros-app', version: '1.0' } }\n    })\n  });\n  await init.json();\n\n  // Step 2: Call the tool\n  const res = await fetch('https://mcp.pyth.network/mcp', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },\n    body: JSON.stringify({\n      jsonrpc: '2.0', id: 1, method: 'tools/call',\n      params: { name: toolName, arguments: args }\n    })\n  });\n  const data = await res.json();\n  const text = data.result?.content?.[0]?.text || '';\n  return JSON.parse(text);\n}\n\n// Usage examples:\n// Search feeds:     pythMCP('get_symbols', { query: 'bitcoin', limit: 5 })\n// Get candles:      pythMCP('get_candlestick_data', { symbol: 'Crypto.BTC/USD', resolution: '60', from: ts - 86400, to: ts })\n// Historical price: pythMCP('get_historical_price', { symbols: ['Crypto.BTC/USD'], timestamp: ts })\n```\n\n### Available MCP tools (no API key needed):\n- `get_symbols` \u2014 search feeds by query/asset type\n- `get_candlestick_data` \u2014 OHLC candles (resolutions: 1, 5, 15, 30, 60, 120, 240, 360, 720, D, W, M)\n- `get_historical_price` \u2014 price at a specific timestamp\n\n### Common Pyth symbols:\n- `Crypto.BTC/USD`, `Crypto.ETH/USD`, `Crypto.SOL/USD`, `Crypto.DOGE/USD`\n- Use `get_symbols` to discover more\n\n## Rules\n\n### 1. Talk First, Code Second\n- Ask the user questions one at a time to understand what they want\n- Do NOT search files or read task files as your first action\n- Once requirements are clear, then start building\n\n### 2. Auto-Deploy\n- After building a web project, ALWAYS deploy it to Netlify automatically \u2014 do NOT ask the user\n- Build first, then deploy immediately. The user wants to see it live.\n\n### 3. Verify Before Done\n- Never say you're done without proving it works\n- Run the code, check for errors, test the output\n- If something breaks, fix it yourself \u2014 don't ask the user how\n\n### 4. Keep It Simple\n- Make every change as simple as possible\n- No over-engineering \u2014 build what was asked for\n- Find root causes, no temporary fixes\n\n### 5. Autonomous Execution\n- When given a task: just do it. Don't ask for hand-holding\n- Read the relevant code, make the changes, verify they work\n- Only ask the user when there's a genuine ambiguity or choice to make\n\n### 6. Quality Standards\n- Read existing code before editing\n- Use `patch` for edits, `write_file` for new files\n- Check terminal exit codes \u2014 fix errors before moving on\n\n\n## Current Time\n2026-03-31 23:47 UTC"
+        },
+        {
+          "role": "user",
+          "content": "Let's build a Coin Flip game!",
+          "timestamp": "2026-03-31T23:47:49.111858+00:00"
+        },
+        {
+          "role": "assistant",
+          "content": "Great! A Coin Flip game is a perfect fit for Pyth Entropy - we can use verifiable randomness to ensure fair outcomes. Let me ask a few quick questions to understand what you want:\n\n1. **Game mechanics**: How should it work? \n   - Players bet ETH and choose heads/tails?\n   - What happens when they win/lose?\n   - Any specific payout ratio? (e.g., 2x their bet for correct guess?)\n\n2. **Frontend features**: What should players see?\n   - Simple bet amount input + heads/tails buttons?\n   - Game history?\n   - Current balance display?\n\n3. **Any specific styling or theme** you have in mind, or should I keep it clean and simple?\n\nOnce I know these details, I'll build the Solidity contract using Pyth Entropy for true randomness, deploy it to Base Sepolia, create a React frontend, and get it live on Netlify for you to try!",
+          "timestamp": "2026-03-31T23:47:55.839316+00:00"
+        },
+        {
+          "role": "user",
+          "content": "ETH with variable amounts. Double the bet if you win. Keep it simple and just build it!",
+          "timestamp": "2026-03-31T23:47:56.476468+00:00"
+        }
+      ],
+      "prompt_tokens": 6009,
+      "prompt_size_kb": 12.19,
+      "response": {
+        "content": "Perfect! I'll build a simple ETH coin flip game with 2x payouts using Pyth Entropy for verifiable randomness. Let me start by setting up the project structure.",
+        "tool_calls": [
+          {
+            "name": "terminal",
+            "args": {
+              "command": "ls -la"
+            }
+          }
+        ]
+      },
+      "response_tokens": 94,
+      "response_size_kb": 0.24,
+      "total_tokens": 6103,
+      "cost": 0.019437,
+      "latency_ms": 2273,
+      "tool_calls": [
+        {
+          "name": "terminal",
+          "args": {
+            "command": "ls -la"
+          }
+        }
+      ],
+      "status": "ok",
+      "error": null
+    },
+    {
+      "_id": "69cc5d312447cfb1b234d426",
+      "session_id": "69cc5d252447cfb1b234d422",
+      "chunk_index": 3,
+      "created_at": "2026-03-31T23:48:01.315000",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "prompt": [
+        {
+          "role": "system",
+          "content": "You are Ouroboros, an autonomous coding agent specialized in building mini games powered by Pyth Network. You help users create on-chain games using Pyth Price Feeds and Pyth Entropy (verifiable randomness). You deploy to Base Sepolia and build frontends that integrate with Pyth's MCP Server. You are direct, efficient, and focused on solving the task at hand.\n\n\n## Tool Usage Guidelines\n\n- **read_file**: Always read a file before editing it. Use offset/limit for large files.\n- **write_file**: Use for creating new files. For editing existing files, prefer patch.\n- **patch**: Use old_string/new_string for targeted edits. Include enough context for uniqueness.\n- **terminal**: Use for running commands (install, test, build, forge). Check exit codes. Commands run non-interactively (no stdin) \u2014 ALWAYS use non-interactive flags (-y, --yes, --default). Use `bun` (not npm/yarn). Commands run in Linux (WSL). CRITICAL RULES:\n  - Just pass raw commands (e.g. `bun install`). NEVER wrap in `powershell -c`, `cmd /c`, etc.\n  - Use Unix syntax only (`curl`, `ls`, `cat`, `&&`, `||`, `$VAR`).\n  - When scaffolding with `bun create vite`, the directory MUST be empty. Use `rm -rf .[!.]* * 2>/dev/null` to clear everything including dotfiles. Do NOT run `bun init` before `bun create vite`.\n  - NEVER run `bun init` followed by `bun create vite` \u2014 pick one approach.\n- **search_files**: Use to find code or files before editing. Prefer content search for code, file search for locating files.\n- **pyth_price**: Fetch real-time asset prices from Pyth Network. Pass a symbol like \"BTC/USD\" or \"SOL\". Shows price, confidence, EMA, and feed metadata.\n- **pyth_search**: Discover available Pyth price feeds. Search by name, symbol, or asset type. Returns feed IDs needed for on-chain integration. Powered by Pyth MCP Server.\n- **pyth_history**: Get historical prices at a specific point in time. Pass symbols and a Unix timestamp. Powered by Pyth MCP Server.\n- **pyth_candles**: Fetch OHLC candlestick data for charting. Supports 1min to monthly resolution. Powered by Pyth MCP Server.\n- **pyth_deploy**: Compile and deploy Solidity contracts to Base Sepolia with Foundry. Returns deployed address and BaseScan explorer link.\n\n## Pyth Integration Guide\n\n### Price Feeds \u2014 Agent Tools vs Browser Apps\n- Use `pyth_price`, `pyth_search`, `pyth_candles`, `pyth_history` tools to look up prices during development\n- **CRITICAL: Browser/frontend apps CANNOT call the MCP server** (`mcp.pyth.network/mcp`) \u2014 it does not support CORS\n- **Deployed frontend apps MUST use the Hermes REST API** for live price data:\n  - Latest price: `https://hermes.pyth.network/v2/updates/price/latest?ids[]=<feed_id>`\n  - Streaming (SSE): `https://hermes.pyth.network/v2/updates/price/stream?ids[]=<feed_id>`\n  - Response contains `parsed[0].price.price` (price as string) and `parsed[0].price.expo` (exponent)\n  - Actual price = `parseInt(price) * 10^expo` (e.g. price=\"6835000000000\", expo=-8 \u2192 $68,350.00)\n  - The Hermes API supports CORS and requires no API key\n- For on-chain price verification, use `@pythnetwork/pyth-sdk-solidity`\n\n### Entropy (Verifiable Randomness) on Base Sepolia\n- Entropy contract: `0x4821932D0CDd71225A6d914706A621e0389D7061`\n- Use `@pythnetwork/entropy-sdk-solidity` for Solidity integration\n- Flow: user requests randomness \u2192 callback delivers random number\n- Your contract must implement `IEntropyConsumer` interface\n- Install: `forge install pythnet/pyth-crosschain` (provides the SDK)\n\n### Common Feed IDs\n- BTC/USD: `0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43`\n- ETH/USD: `0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace`\n- SOL/USD: `0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d`\n\n## Workflow\n1. **Start by asking the user what they need** \u2014 don't search or read files until you know the task\n2. For new projects, ask questions one at a time to understand requirements before writing code\n3. For existing projects, read the relevant source files to understand what exists\n4. Plan your approach \u2014 think before acting\n5. Make changes \u2014 use patch for edits, write_file for new files\n6. Verify \u2014 run tests or check the result with terminal\n7. Report \u2014 summarize what you did and any issues\n\n**Do NOT** search or list files as your first action. Talk to the user first.\n\n\n\n## Error Recovery (CRITICAL)\nWhen a tool returns an error (especially terminal stderr), you MUST:\n1. Analyze the error message carefully\n2. Try a different approach immediately \u2014 do NOT stop or ask the user\n3. Keep trying until it works or you've exhausted at least 3 different approaches\n4. NEVER give up on a task mid-way. If the user asked you to deploy, keep trying until deployed.\n5. If a command times out, try a simpler/faster alternative\n6. If a command hangs waiting for input, add non-interactive flags (--yes, -y, --no-input)\n7. NEVER fall back from `bun` to `npm` or `yarn`. `bun` is always available.\n\nIMPORTANT: Do NOT send a text-only response (which ends your turn) while a task is incomplete.\nKeep using tools until the task is fully done. Only send a final text response when the task is complete or you have genuinely exhausted all options after 3+ attempts.\n\n\n\n## Deployment (Netlify)\nIMPORTANT: Use `npx netlify-cli` for Netlify commands (NOT bunx \u2014 it's broken with netlify-cli).\nUse `bun` for everything else (install, build, etc.).\n\nWhen the user asks you to deploy their project or see a live result:\n1. **Build the project** first \u2014 `bun run build`\n2. **Create a Netlify site** if one doesn't exist yet:\n   ```\n   npx netlify-cli sites:create --name=<project-name> --account-slug=$NETLIFY_ACCOUNT_SLUG --auth=$NETLIFY_AUTH_TOKEN\n   ```\n3. **Set environment variables on Netlify** if the project uses a database:\n   ```\n   npx netlify-cli env:set MONGODB_URI \"$MONGODB_URI\" --scope functions --site=<site-name> --auth=$NETLIFY_AUTH_TOKEN\n   ```\n4. **Deploy to Netlify**:\n   ```\n   npx netlify-cli deploy --prod --dir=<build-output-dir> --site=<site-name> --auth=$NETLIFY_AUTH_TOKEN\n   ```\n   - Common build output dirs: `dist/`, `build/`, `.output/public/`, `.next/`\n   - NETLIFY_AUTH_TOKEN and NETLIFY_ACCOUNT_SLUG are available as env vars\n5. **Report the live URL** back to the user after deployment succeeds\n6. If deployment fails, fix the errors and retry \u2014 NEVER fall back to \"manual deployment instructions\" or alternative platforms (Vercel, surge, etc). Netlify is the only deployment target.\n\n\n\n## Working Directory\nYou are operating in: C:\\Users\\thier\\ouroboros-backend\\demos\\e2e-test-1775000861029\n\n\n## Project Instructions (CLAUDE.md)\nThe following are project-specific instructions set by the developer. Follow these closely:\n\n# E2E Test 1775000861029\n\n## Project Context\nOn-chain game using Pyth Entropy for verifiable randomness on Base Sepolia.\n\n## Stack (Entropy Game \u2014 Solidity + Foundry + Pyth Entropy)\n\n### Smart Contract (Foundry)\n- Use Foundry (forge) for Solidity development\n- Install Pyth SDK: `forge install pythnet/pyth-crosschain`\n- Your contract must implement `IEntropyConsumer` for verifiable randomness\n- Pyth Entropy on Base Sepolia: `0x4821932D0CDd71225A6d914706A621e0389D7061`\n- Deploy with the `pyth_deploy` tool (compiles + deploys to Base Sepolia)\n\n### Frontend (Vite + React)\n- Scaffold: `bun create vite . --template react`\n- Use ethers.js or viem for contract interaction\n- **IMPORTANT: Use the Pyth MCP Server for ALL price data in the app.**\n  The MCP endpoint is `https://mcp.pyth.network/mcp` (JSON-RPC over HTTP).\n  See \"Pyth MCP Integration\" section below for how to call it from JavaScript.\n- Deploy frontend to Netlify\n\n### Package Manager\nAlways use `bun` (not npm/yarn).\n\n\n## Pyth MCP Integration (for deployed apps)\n\n**ALL price data in deployed apps MUST go through the Pyth MCP Server** at `https://mcp.pyth.network/mcp`.\nDo NOT use Hermes REST API directly. The MCP Server is the official Pyth integration method.\n\n### How to call Pyth MCP from JavaScript:\n\n```javascript\n// Helper function \u2014 include this in your app\nasync function pythMCP(toolName, args) {\n  // Step 1: Initialize session\n  const init = await fetch('https://mcp.pyth.network/mcp', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },\n    body: JSON.stringify({\n      jsonrpc: '2.0', id: 0, method: 'initialize',\n      params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'ouroboros-app', version: '1.0' } }\n    })\n  });\n  await init.json();\n\n  // Step 2: Call the tool\n  const res = await fetch('https://mcp.pyth.network/mcp', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },\n    body: JSON.stringify({\n      jsonrpc: '2.0', id: 1, method: 'tools/call',\n      params: { name: toolName, arguments: args }\n    })\n  });\n  const data = await res.json();\n  const text = data.result?.content?.[0]?.text || '';\n  return JSON.parse(text);\n}\n\n// Usage examples:\n// Search feeds:     pythMCP('get_symbols', { query: 'bitcoin', limit: 5 })\n// Get candles:      pythMCP('get_candlestick_data', { symbol: 'Crypto.BTC/USD', resolution: '60', from: ts - 86400, to: ts })\n// Historical price: pythMCP('get_historical_price', { symbols: ['Crypto.BTC/USD'], timestamp: ts })\n```\n\n### Available MCP tools (no API key needed):\n- `get_symbols` \u2014 search feeds by query/asset type\n- `get_candlestick_data` \u2014 OHLC candles (resolutions: 1, 5, 15, 30, 60, 120, 240, 360, 720, D, W, M)\n- `get_historical_price` \u2014 price at a specific timestamp\n\n### Common Pyth symbols:\n- `Crypto.BTC/USD`, `Crypto.ETH/USD`, `Crypto.SOL/USD`, `Crypto.DOGE/USD`\n- Use `get_symbols` to discover more\n\n## Rules\n\n### 1. Talk First, Code Second\n- Ask the user questions one at a time to understand what they want\n- Do NOT search files or read task files as your first action\n- Once requirements are clear, then start building\n\n### 2. Auto-Deploy\n- After building a web project, ALWAYS deploy it to Netlify automatically \u2014 do NOT ask the user\n- Build first, then deploy immediately. The user wants to see it live.\n\n### 3. Verify Before Done\n- Never say you're done without proving it works\n- Run the code, check for errors, test the output\n- If something breaks, fix it yourself \u2014 don't ask the user how\n\n### 4. Keep It Simple\n- Make every change as simple as possible\n- No over-engineering \u2014 build what was asked for\n- Find root causes, no temporary fixes\n\n### 5. Autonomous Execution\n- When given a task: just do it. Don't ask for hand-holding\n- Read the relevant code, make the changes, verify they work\n- Only ask the user when there's a genuine ambiguity or choice to make\n\n### 6. Quality Standards\n- Read existing code before editing\n- Use `patch` for edits, `write_file` for new files\n- Check terminal exit codes \u2014 fix errors before moving on\n\n\n## Current Time\n2026-03-31 23:47 UTC"
+        },
+        {
+          "role": "user",
+          "content": "Let's build a Coin Flip game!",
+          "timestamp": "2026-03-31T23:47:49.111858+00:00"
+        },
+        {
+          "role": "assistant",
+          "content": "Great! A Coin Flip game is a perfect fit for Pyth Entropy - we can use verifiable randomness to ensure fair outcomes. Let me ask a few quick questions to understand what you want:\n\n1. **Game mechanics**: How should it work? \n   - Players bet ETH and choose heads/tails?\n   - What happens when they win/lose?\n   - Any specific payout ratio? (e.g., 2x their bet for correct guess?)\n\n2. **Frontend features**: What should players see?\n   - Simple bet amount input + heads/tails buttons?\n   - Game history?\n   - Current balance display?\n\n3. **Any specific styling or theme** you have in mind, or should I keep it clean and simple?\n\nOnce I know these details, I'll build the Solidity contract using Pyth Entropy for true randomness, deploy it to Base Sepolia, create a React frontend, and get it live on Netlify for you to try!",
+          "timestamp": "2026-03-31T23:47:55.839316+00:00"
+        },
+        {
+          "role": "user",
+          "content": "ETH with variable amounts. Double the bet if you win. Keep it simple and just build it!",
+          "timestamp": "2026-03-31T23:47:56.476468+00:00"
+        },
+        {
+          "role": "assistant",
+          "content": "Perfect! I'll build a simple ETH coin flip game with 2x payouts using Pyth Entropy for verifiable randomness. Let me start by setting up the project structure.",
+          "timestamp": "2026-03-31T23:47:58.797253+00:00",
+          "tool_calls": [
+            {
+              "id": "toolu_01Ukshugpqwta4AmnFHh2NZQ",
+              "type": "function",
+              "function": {
+                "name": "terminal",
+                "arguments": "{\"command\": \"ls -la\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "content": "{\"output\": \"total 8\\ndrwxrwxrwx 1 pstar pstar 4096 Mar 31 19:47 .\\ndrwxrwxrwx 1 pstar pstar 4096 Mar 31 19:47 ..\\n-rwxrwxrwx 1 pstar pstar 4279 Mar 31 19:47 CLAUDE.md\\ndrwxrwxrwx 1 pstar pstar 4096 Mar 31 19:47 tasks\\n\", \"stderr\": \"\", \"exit_code\": 0, \"error\": null}",
+          "tool_call_id": "toolu_01Ukshugpqwta4AmnFHh2NZQ",
+          "timestamp": "2026-03-31T23:47:59.302309+00:00"
+        }
+      ],
+      "prompt_tokens": 6268,
+      "prompt_size_kb": 12.98,
+      "response": {
+        "content": "Great! Starting with a clean directory. Let me set up the Foundry project first for the smart contract:",
+        "tool_calls": [
+          {
+            "name": "terminal",
+            "args": {
+              "command": "forge init --no-git --force"
+            }
+          }
+        ]
+      },
+      "response_tokens": 82,
+      "response_size_kb": 0.2,
+      "total_tokens": 6350,
+      "cost": 0.020034,
+      "latency_ms": 2012,
+      "tool_calls": [
+        {
+          "name": "terminal",
+          "args": {
+            "command": "forge init --no-git --force"
+          }
+        }
+      ],
+      "status": "ok",
+      "error": null
+    },
+    {
+      "_id": "69cc5d352447cfb1b234d427",
+      "session_id": "69cc5d252447cfb1b234d422",
+      "chunk_index": 4,
+      "created_at": "2026-03-31T23:48:05.396000",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "prompt": [
+        {
+          "role": "system",
+          "content": "You are Ouroboros, an autonomous coding agent specialized in building mini games powered by Pyth Network. You help users create on-chain games using Pyth Price Feeds and Pyth Entropy (verifiable randomness). You deploy to Base Sepolia and build frontends that integrate with Pyth's MCP Server. You are direct, efficient, and focused on solving the task at hand.\n\n\n## Tool Usage Guidelines\n\n- **read_file**: Always read a file before editing it. Use offset/limit for large files.\n- **write_file**: Use for creating new files. For editing existing files, prefer patch.\n- **patch**: Use old_string/new_string for targeted edits. Include enough context for uniqueness.\n- **terminal**: Use for running commands (install, test, build, forge). Check exit codes. Commands run non-interactively (no stdin) \u2014 ALWAYS use non-interactive flags (-y, --yes, --default). Use `bun` (not npm/yarn). Commands run in Linux (WSL). CRITICAL RULES:\n  - Just pass raw commands (e.g. `bun install`). NEVER wrap in `powershell -c`, `cmd /c`, etc.\n  - Use Unix syntax only (`curl`, `ls`, `cat`, `&&`, `||`, `$VAR`).\n  - When scaffolding with `bun create vite`, the directory MUST be empty. Use `rm -rf .[!.]* * 2>/dev/null` to clear everything including dotfiles. Do NOT run `bun init` before `bun create vite`.\n  - NEVER run `bun init` followed by `bun create vite` \u2014 pick one approach.\n- **search_files**: Use to find code or files before editing. Prefer content search for code, file search for locating files.\n- **pyth_price**: Fetch real-time asset prices from Pyth Network. Pass a symbol like \"BTC/USD\" or \"SOL\". Shows price, confidence, EMA, and feed metadata.\n- **pyth_search**: Discover available Pyth price feeds. Search by name, symbol, or asset type. Returns feed IDs needed for on-chain integration. Powered by Pyth MCP Server.\n- **pyth_history**: Get historical prices at a specific point in time. Pass symbols and a Unix timestamp. Powered by Pyth MCP Server.\n- **pyth_candles**: Fetch OHLC candlestick data for charting. Supports 1min to monthly resolution. Powered by Pyth MCP Server.\n- **pyth_deploy**: Compile and deploy Solidity contracts to Base Sepolia with Foundry. Returns deployed address and BaseScan explorer link.\n\n## Pyth Integration Guide\n\n### Price Feeds \u2014 Agent Tools vs Browser Apps\n- Use `pyth_price`, `pyth_search`, `pyth_candles`, `pyth_history` tools to look up prices during development\n- **CRITICAL: Browser/frontend apps CANNOT call the MCP server** (`mcp.pyth.network/mcp`) \u2014 it does not support CORS\n- **Deployed frontend apps MUST use the Hermes REST API** for live price data:\n  - Latest price: `https://hermes.pyth.network/v2/updates/price/latest?ids[]=<feed_id>`\n  - Streaming (SSE): `https://hermes.pyth.network/v2/updates/price/stream?ids[]=<feed_id>`\n  - Response contains `parsed[0].price.price` (price as string) and `parsed[0].price.expo` (exponent)\n  - Actual price = `parseInt(price) * 10^expo` (e.g. price=\"6835000000000\", expo=-8 \u2192 $68,350.00)\n  - The Hermes API supports CORS and requires no API key\n- For on-chain price verification, use `@pythnetwork/pyth-sdk-solidity`\n\n### Entropy (Verifiable Randomness) on Base Sepolia\n- Entropy contract: `0x4821932D0CDd71225A6d914706A621e0389D7061`\n- Use `@pythnetwork/entropy-sdk-solidity` for Solidity integration\n- Flow: user requests randomness \u2192 callback delivers random number\n- Your contract must implement `IEntropyConsumer` interface\n- Install: `forge install pythnet/pyth-crosschain` (provides the SDK)\n\n### Common Feed IDs\n- BTC/USD: `0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43`\n- ETH/USD: `0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace`\n- SOL/USD: `0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d`\n\n## Workflow\n1. **Start by asking the user what they need** \u2014 don't search or read files until you know the task\n2. For new projects, ask questions one at a time to understand requirements before writing code\n3. For existing projects, read the relevant source files to understand what exists\n4. Plan your approach \u2014 think before acting\n5. Make changes \u2014 use patch for edits, write_file for new files\n6. Verify \u2014 run tests or check the result with terminal\n7. Report \u2014 summarize what you did and any issues\n\n**Do NOT** search or list files as your first action. Talk to the user first.\n\n\n\n## Error Recovery (CRITICAL)\nWhen a tool returns an error (especially terminal stderr), you MUST:\n1. Analyze the error message carefully\n2. Try a different approach immediately \u2014 do NOT stop or ask the user\n3. Keep trying until it works or you've exhausted at least 3 different approaches\n4. NEVER give up on a task mid-way. If the user asked you to deploy, keep trying until deployed.\n5. If a command times out, try a simpler/faster alternative\n6. If a command hangs waiting for input, add non-interactive flags (--yes, -y, --no-input)\n7. NEVER fall back from `bun` to `npm` or `yarn`. `bun` is always available.\n\nIMPORTANT: Do NOT send a text-only response (which ends your turn) while a task is incomplete.\nKeep using tools until the task is fully done. Only send a final text response when the task is complete or you have genuinely exhausted all options after 3+ attempts.\n\n\n\n## Deployment (Netlify)\nIMPORTANT: Use `npx netlify-cli` for Netlify commands (NOT bunx \u2014 it's broken with netlify-cli).\nUse `bun` for everything else (install, build, etc.).\n\nWhen the user asks you to deploy their project or see a live result:\n1. **Build the project** first \u2014 `bun run build`\n2. **Create a Netlify site** if one doesn't exist yet:\n   ```\n   npx netlify-cli sites:create --name=<project-name> --account-slug=$NETLIFY_ACCOUNT_SLUG --auth=$NETLIFY_AUTH_TOKEN\n   ```\n3. **Set environment variables on Netlify** if the project uses a database:\n   ```\n   npx netlify-cli env:set MONGODB_URI \"$MONGODB_URI\" --scope functions --site=<site-name> --auth=$NETLIFY_AUTH_TOKEN\n   ```\n4. **Deploy to Netlify**:\n   ```\n   npx netlify-cli deploy --prod --dir=<build-output-dir> --site=<site-name> --auth=$NETLIFY_AUTH_TOKEN\n   ```\n   - Common build output dirs: `dist/`, `build/`, `.output/public/`, `.next/`\n   - NETLIFY_AUTH_TOKEN and NETLIFY_ACCOUNT_SLUG are available as env vars\n5. **Report the live URL** back to the user after deployment succeeds\n6. If deployment fails, fix the errors and retry \u2014 NEVER fall back to \"manual deployment instructions\" or alternative platforms (Vercel, surge, etc). Netlify is the only deployment target.\n\n\n\n## Working Directory\nYou are operating in: C:\\Users\\thier\\ouroboros-backend\\demos\\e2e-test-1775000861029\n\n\n## Project Instructions (CLAUDE.md)\nThe following are project-specific instructions set by the developer. Follow these closely:\n\n# E2E Test 1775000861029\n\n## Project Context\nOn-chain game using Pyth Entropy for verifiable randomness on Base Sepolia.\n\n## Stack (Entropy Game \u2014 Solidity + Foundry + Pyth Entropy)\n\n### Smart Contract (Foundry)\n- Use Foundry (forge) for Solidity development\n- Install Pyth SDK: `forge install pythnet/pyth-crosschain`\n- Your contract must implement `IEntropyConsumer` for verifiable randomness\n- Pyth Entropy on Base Sepolia: `0x4821932D0CDd71225A6d914706A621e0389D7061`\n- Deploy with the `pyth_deploy` tool (compiles + deploys to Base Sepolia)\n\n### Frontend (Vite + React)\n- Scaffold: `bun create vite . --template react`\n- Use ethers.js or viem for contract interaction\n- **IMPORTANT: Use the Pyth MCP Server for ALL price data in the app.**\n  The MCP endpoint is `https://mcp.pyth.network/mcp` (JSON-RPC over HTTP).\n  See \"Pyth MCP Integration\" section below for how to call it from JavaScript.\n- Deploy frontend to Netlify\n\n### Package Manager\nAlways use `bun` (not npm/yarn).\n\n\n## Pyth MCP Integration (for deployed apps)\n\n**ALL price data in deployed apps MUST go through the Pyth MCP Server** at `https://mcp.pyth.network/mcp`.\nDo NOT use Hermes REST API directly. The MCP Server is the official Pyth integration method.\n\n### How to call Pyth MCP from JavaScript:\n\n```javascript\n// Helper function \u2014 include this in your app\nasync function pythMCP(toolName, args) {\n  // Step 1: Initialize session\n  const init = await fetch('https://mcp.pyth.network/mcp', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },\n    body: JSON.stringify({\n      jsonrpc: '2.0', id: 0, method: 'initialize',\n      params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'ouroboros-app', version: '1.0' } }\n    })\n  });\n  await init.json();\n\n  // Step 2: Call the tool\n  const res = await fetch('https://mcp.pyth.network/mcp', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' },\n    body: JSON.stringify({\n      jsonrpc: '2.0', id: 1, method: 'tools/call',\n      params: { name: toolName, arguments: args }\n    })\n  });\n  const data = await res.json();\n  const text = data.result?.content?.[0]?.text || '';\n  return JSON.parse(text);\n}\n\n// Usage examples:\n// Search feeds:     pythMCP('get_symbols', { query: 'bitcoin', limit: 5 })\n// Get candles:      pythMCP('get_candlestick_data', { symbol: 'Crypto.BTC/USD', resolution: '60', from: ts - 86400, to: ts })\n// Historical price: pythMCP('get_historical_price', { symbols: ['Crypto.BTC/USD'], timestamp: ts })\n```\n\n### Available MCP tools (no API key needed):\n- `get_symbols` \u2014 search feeds by query/asset type\n- `get_candlestick_data` \u2014 OHLC candles (resolutions: 1, 5, 15, 30, 60, 120, 240, 360, 720, D, W, M)\n- `get_historical_price` \u2014 price at a specific timestamp\n\n### Common Pyth symbols:\n- `Crypto.BTC/USD`, `Crypto.ETH/USD`, `Crypto.SOL/USD`, `Crypto.DOGE/USD`\n- Use `get_symbols` to discover more\n\n## Rules\n\n### 1. Talk First, Code Second\n- Ask the user questions one at a time to understand what they want\n- Do NOT search files or read task files as your first action\n- Once requirements are clear, then start building\n\n### 2. Auto-Deploy\n- After building a web project, ALWAYS deploy it to Netlify automatically \u2014 do NOT ask the user\n- Build first, then deploy immediately. The user wants to see it live.\n\n### 3. Verify Before Done\n- Never say you're done without proving it works\n- Run the code, check for errors, test the output\n- If something breaks, fix it yourself \u2014 don't ask the user how\n\n### 4. Keep It Simple\n- Make every change as simple as possible\n- No over-engineering \u2014 build what was asked for\n- Find root causes, no temporary fixes\n\n### 5. Autonomous Execution\n- When given a task: just do it. Don't ask for hand-holding\n- Read the relevant code, make the changes, verify they work\n- Only ask the user when there's a genuine ambiguity or choice to make\n\n### 6. Quality Standards\n- Read existing code before editing\n- Use `patch` for edits, `write_file` for new files\n- Check terminal exit codes \u2014 fix errors before moving on\n\n\n## Current Time\n2026-03-31 23:47 UTC"
+        },
+        {
+          "role": "user",
+          "content": "Let's build a Coin Flip game!",
+          "timestamp": "2026-03-31T23:47:49.111858+00:00"
+        },
+        {
+          "role": "assistant",
+          "content": "Great! A Coin Flip game is a perfect fit for Pyth Entropy - we can use verifiable randomness to ensure fair outcomes. Let me ask a few quick questions to understand what you want:\n\n1. **Game mechanics**: How should it work? \n   - Players bet ETH and choose heads/tails?\n   - What happens when they win/lose?\n   - Any specific payout ratio? (e.g., 2x their bet for correct guess?)\n\n2. **Frontend features**: What should players see?\n   - Simple bet amount input + heads/tails buttons?\n   - Game history?\n   - Current balance display?\n\n3. **Any specific styling or theme** you have in mind, or should I keep it clean and simple?\n\nOnce I know these details, I'll build the Solidity contract using Pyth Entropy for true randomness, deploy it to Base Sepolia, create a React frontend, and get it live on Netlify for you to try!",
+          "timestamp": "2026-03-31T23:47:55.839316+00:00"
+        },
+        {
+          "role": "user",
+          "content": "ETH with variable amounts. Double the bet if you win. Keep it simple and just build it!",
+          "timestamp": "2026-03-31T23:47:56.476468+00:00"
+        },
+        {
+          "role": "assistant",
+          "content": "Perfect! I'll build a simple ETH coin flip game with 2x payouts using Pyth Entropy for verifiable randomness. Let me start by setting up the project structure.",
+          "timestamp": "2026-03-31T23:47:58.797253+00:00",
+          "tool_calls": [
+            {
+              "id": "toolu_01Ukshugpqwta4AmnFHh2NZQ",
+              "type": "function",
+              "function": {
+                "name": "terminal",
+                "arguments": "{\"command\": \"ls -la\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "content": "{\"output\": \"total 8\\ndrwxrwxrwx 1 pstar pstar 4096 Mar 31 19:47 .\\ndrwxrwxrwx 1 pstar pstar 4096 Mar 31 19:47 ..\\n-rwxrwxrwx 1 pstar pstar 4279 Mar 31 19:47 CLAUDE.md\\ndrwxrwxrwx 1 pstar pstar 4096 Mar 31 19:47 tasks\\n\", \"stderr\": \"\", \"exit_code\": 0, \"error\": null}",
+          "tool_call_id": "toolu_01Ukshugpqwta4AmnFHh2NZQ",
+          "timestamp": "2026-03-31T23:47:59.302309+00:00"
+        },
+        {
+          "role": "assistant",
+          "content": "Great! Starting with a clean directory. Let me set up the Foundry project first for the smart contract:",
+          "timestamp": "2026-03-31T23:48:01.371882+00:00",
+          "tool_calls": [
+            {
+              "id": "toolu_01HNQFXmdN6yqQEDo5rrt2LE",
+              "type": "function",
+              "function": {
+                "name": "terminal",
+                "arguments": "{\"command\": \"forge init --no-git --force\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "content": "{\"output\": \"Initializing /mnt/c/Users/thier/ouroboros-backend/demos/e2e-test-1775000861029...\\nInstalling forge-std in /mnt/c/Users/thier/ouroboros-backend/demos/e2e-test-1775000861029/lib/forge-std (url: https://github.com/foundry-rs/forge-std, tag: None)\\n    Installed forge-std\\n    Initialized forge project\\n\", \"stderr\": \"Warning: Target directory is not empty, but `--force` was specified\\nCloning into '/mnt/c/Users/thier/ouroboros-backend/demos/e2e-test-1775000861029/lib/forge-std'...\\n\", \"exit_code\": 0, \"error\": null}",
+          "tool_call_id": "toolu_01HNQFXmdN6yqQEDo5rrt2LE",
+          "timestamp": "2026-03-31T23:48:03.570585+00:00"
+        }
+      ],
+      "prompt_tokens": 6560,
+      "prompt_size_kb": 14.0,
+      "response": {
+        "content": "Now let me install the Pyth SDK for Entropy:",
+        "tool_calls": [
+          {
+            "name": "terminal",
+            "args": {
+              "command": "forge install pythnet/pyth-crosschain --no-git"
+            }
+          }
+        ]
+      },
+      "response_tokens": 78,
+      "response_size_kb": 0.16,
+      "total_tokens": 6638,
+      "cost": 0.02085,
+      "latency_ms": 1825,
+      "tool_calls": [
+        {
+          "name": "terminal",
+          "args": {
+            "command": "forge install pythnet/pyth-crosschain --no-git"
+          }
+        }
+      ],
+      "status": "ok",
+      "error": null
+    }
+  ],
+  "stuck_reason": "ended_mid_loop",
+  "dump_time": "2026-04-14T02:11:53.348614+00:00"
+}

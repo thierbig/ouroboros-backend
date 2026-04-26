@@ -60,6 +60,32 @@ async def update_session_status(
     )
 
 
+async def mark_disconnected(
+    session_id: ObjectId | str,
+    total_tokens: int = 0,
+    total_cost: float = 0.0,
+) -> None:
+    """Mark a session as disconnected by the WebSocket transport.
+
+    Distinct from "completed" (clean end of turn) and "error" (exception
+    in the agent loop): this captures the case where the client socket
+    dropped mid-stream. Only updates if the session is still "running"
+    so a legitimate prior completion isn't overwritten by a late client
+    close.
+    """
+    db = await get_database()
+    if isinstance(session_id, str):
+        session_id = ObjectId(session_id)
+    await db.sessions.update_one(
+        {"_id": session_id, "status": "running"},
+        {"$set": {
+            "status": "disconnected",
+            "total_tokens": total_tokens,
+            "total_cost": total_cost,
+        }},
+    )
+
+
 async def update_session_messages(session_id: ObjectId | str, messages: list[dict]) -> None:
     db = await get_database()
     if isinstance(session_id, str):

@@ -54,6 +54,21 @@ TOOL_GUIDANCE = """
 - ETH/USD: `0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace`
 - SOL/USD: `0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d`
 
+## Foundry / Solidity deploy recipe
+
+**Prefer `pyth_deploy` over raw forge** for Entropy deployments. It wraps `forge build` + `forge create`, targets Base Sepolia, and knows the Pyth Entropy contract address — you do not need to bootstrap forge yourself for the happy path.
+
+If you must drive forge directly, the sandbox does not have it pre-installed and each `terminal` call runs in a fresh non-persistent shell — PATH edits written by the foundry installer to `~/.bashrc` do NOT survive to the next tool call. Canonical recipe:
+
+1. `curl -L https://foundry.paradigm.xyz | bash` (installs the `foundryup` bootstrapper into `$HOME/.foundry/bin`).
+2. `$HOME/.foundry/bin/foundryup` (installs `forge`, `cast`, `anvil`).
+3. On EVERY subsequent forge/cast command, prepend PATH inline: `PATH="$HOME/.foundry/bin:$PATH" forge …`. Do NOT rely on `source ~/.bashrc` — it will not stick.
+
+Gotchas that burn iterations:
+- `forge install <dep>` runs `git submodule add` under the hood — it requires a git repo. If you used `forge init --no-git` (or just don't have `.git/`), run `git init` first, otherwise install fails with *"fatal: not a git repository"*.
+- The `--no-commit` flag was REMOVED in modern forge. Do not pass it — `forge install pythnet/pyth-crosschain` is the current form, not `forge install pythnet/pyth-crosschain --no-commit`.
+- Never emit JSON-escaped quotes (`\"`) inside a terminal command. Use plain `"` — `PATH="$HOME/.foundry/bin:$PATH" forge …`.
+
 ## Workflow
 1. **Start by asking the user what they need** — don't search or read files until you know the task
 2. For new projects, ask questions one at a time to understand requirements before writing code
@@ -79,6 +94,31 @@ When a tool returns an error (especially terminal stderr), you MUST:
 
 IMPORTANT: Do NOT send a text-only response (which ends your turn) while a task is incomplete.
 Keep using tools until the task is fully done. Only send a final text response when the task is complete or you have genuinely exhausted all options after 3+ attempts.
+"""
+
+TRUTHFUL_REPORTING = """
+## Truthful Reporting (CRITICAL — NEVER VIOLATE)
+If the last tool call in this turn returned an error — any non-empty `error` field,
+`exit_code != 0`, or a known failure sentinel (e.g. `DEPLOYER_PRIVATE_KEY`, "fatal:",
+"command not found", "build failed", a `pyth_deploy` error response, a `netlify-cli`
+non-zero exit) — you MUST NOT claim that the deploy, build, contract, or site
+succeeded in your response. Report the error verbatim and state the next step you
+will take instead. Keep using tools until the task is actually done.
+
+- NEVER fabricate a URL, site name, contract address, or transaction hash. Only
+  report values that appear in a tool result you just received.
+- You MUST verify any URL you report with a subsequent tool call before claiming
+  deployment success — e.g. `npx netlify-cli sites:list --auth=$NETLIFY_AUTH_TOKEN`,
+  `npx netlify-cli status --site=<name> --auth=$NETLIFY_AUTH_TOKEN`, or
+  `curl -sI <url>`. A 2xx/3xx response or an entry in `sites:list` is the proof.
+  No verification → no success claim.
+- If `pyth_deploy` returns an error, you have NOT deployed a contract. Do not
+  then invent a `.netlify.app` URL and describe the app as "deployed" — fix the
+  underlying `pyth_deploy` failure (or report it and ask the user) before
+  touching the frontend deploy path.
+- A tool result that is a JSON object containing `"error"` counts as a failure
+  even when the terminal exit_code was 0. Treat the `error` field as
+  authoritative.
 """
 
 SECURITY_RULES = """
@@ -132,7 +172,14 @@ def _read_project_file(working_dir: str, filename: str) -> str | None:
 
 def build_system_prompt(working_dir: str | None = None) -> str:
     """Build the full system prompt with all layers, including project-specific context."""
-    parts = [AGENT_IDENTITY, SECURITY_RULES, TOOL_GUIDANCE, ERROR_RECOVERY, DEPLOY_GUIDANCE]
+    parts = [
+        AGENT_IDENTITY,
+        SECURITY_RULES,
+        TRUTHFUL_REPORTING,
+        TOOL_GUIDANCE,
+        ERROR_RECOVERY,
+        DEPLOY_GUIDANCE,
+    ]
 
     if working_dir:
         parts.append(

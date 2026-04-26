@@ -1,0 +1,31 @@
+{
+  "session_id": "69cc194866eebfa5ccde6a6f",
+  "run_idx": 0,
+  "bucket": "golden",
+  "baseline_outcome_in_data": "completed",
+  "initial_user_message": "Simple scoring",
+  "seeded_history_length": 9,
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-20250514",
+  "working_dir": "C:\\Users\\thier\\ouroboros-temp\\replay\\69cc194866eebfa5ccde6a6f_0",
+  "started_at": "2026-04-14T05:19:36.964199+00:00",
+  "elapsed_seconds": 3.94,
+  "iteration_count": 0,
+  "total_tokens": 5497,
+  "outcome": "completed_clean",
+  "exception": null,
+  "final_response": "Perfect! Clean and focused on the core prediction mechanic.\n\nWhich crypto should players predict on?\n\n- **Bitcoin (BTC)** - most popular, lots of movement\n- **Ethereum (ETH)** - second biggest, good volatility  \n- **Solana (SOL)** - fast and trendy\n- **Multiple coins** - let players choose Bitcoin, Ethereum, or Solana each round\n- **Random rotation** - game picks a different crypto each round\n\nWhat would make the predictions most exciting?",
+  "event_count": 2,
+  "events": [
+    {
+      "type": "status",
+      "message": "Thinking...",
+      "iteration": 1,
+      "max_iterations": 100
+    },
+    {
+      "type": "response",
+      "content": "Perfect! Clean and focused on the core prediction mechanic.\n\nWhich crypto should players predict on?\n\n- **Bitcoin (BTC)** - most popular, lots of movement\n- **Ethereum (ETH)** - second biggest, good volatility  \n- **Solana (SOL)** - fast and trendy\n- **Multiple coins** - let players choose Bitcoin, Ethereum, or Solana each round\n- **Random rotation** - game picks a different crypto each round\n\nWhat would make the predictions most exciting?"
+    }
+  ]
+}

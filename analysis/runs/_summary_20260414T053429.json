@@ -1,0 +1,110 @@
+[
+  {
+    "session_id": "69cafdd3c9ee05a19b45638a",
+    "run_idx": 0,
+    "bucket": "foundry-install-loop",
+    "outcome": "completed_clean",
+    "iterations": 19,
+    "tokens": 193497,
+    "elapsed": 201.08
+  },
+  {
+    "session_id": "69cb280662972386aaf55ff4",
+    "run_idx": 0,
+    "bucket": "foundry-install-loop",
+    "outcome": "completed_clean",
+    "iterations": 29,
+    "tokens": 365620,
+    "elapsed": 458.02
+  },
+  {
+    "session_id": "69cc0171365f162bc336119f",
+    "run_idx": 0,
+    "bucket": "foundry-install-loop",
+    "outcome": "completed_clean",
+    "iterations": 21,
+    "tokens": 219565,
+    "elapsed": 242.66
+  },
+  {
+    "session_id": "69cc5c542447cfb1b234d419",
+    "run_idx": 0,
+    "bucket": "foundry-install-loop",
+    "outcome": "completed_clean",
+    "iterations": 31,
+    "tokens": 377497,
+    "elapsed": 457.84
+  },
+  {
+    "session_id": "69cc5d252447cfb1b234d422",
+    "run_idx": 0,
+    "bucket": "foundry-install-loop",
+    "outcome": "completed_clean",
+    "iterations": 30,
+    "tokens": 419590,
+    "elapsed": 716.2
+  },
+  {
+    "session_id": "69caf6db825fef911ec3ebd3",
+    "run_idx": 0,
+    "bucket": "empty-resume-context",
+    "outcome": "completed_clean",
+    "iterations": 3,
+    "tokens": 21832,
+    "elapsed": 11.42
+  },
+  {
+    "session_id": "69c5c96fd00e0eacbd9bc64f",
+    "run_idx": 0,
+    "bucket": "api-tool-result-mismatch",
+    "outcome": "completed_clean",
+    "iterations": 21,
+    "tokens": 748023,
+    "elapsed": 386.98
+  },
+  {
+    "session_id": "69cc194866eebfa5ccde6a6f",
+    "run_idx": 0,
+    "bucket": "golden",
+    "outcome": "completed_clean",
+    "iterations": 0,
+    "tokens": 5497,
+    "elapsed": 3.94
+  },
+  {
+    "session_id": "69cc20f34735ef0c0f1c3089",
+    "run_idx": 0,
+    "bucket": "golden",
+    "outcome": "completed_clean",
+    "iterations": 20,
+    "tokens": 201122,
+    "elapsed": 194.95
+  },
+  {
+    "session_id": "69cbefc607eb531d6dbd5f21",
+    "run_idx": 0,
+    "bucket": "golden",
+    "outcome": "completed_clean",
+    "iterations": 17,
+    "tokens": 173417,
+    "elapsed": 183.56
+  },
+  {
+    "session_id": "69cc06975ef566cf5fe2e06d",
+    "run_idx": 0,
+    "bucket": "golden",
+    "outcome": "completed_clean",
+    "iterations": 16,
+    "tokens": 178723,
+    "elapsed": 322.55
+  },
+  {
+    "session_id": "69cbfb652f17f872550f8ab9",
+    "run_idx": 0,
+    "bucket": "golden",
+    "outcome": "completed_clean",
+    "iterations": 16,
+    "tokens": 201659,
+    "elapsed": 190.91
+  }
+]

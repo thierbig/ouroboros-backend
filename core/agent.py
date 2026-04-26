@@ -1,5 +1,6 @@
 """Ouroboros agent loop -- ReAct pattern with streaming events."""
 
+import asyncio
 import json
 from datetime import datetime, timezone
 from typing import AsyncIterator
@@ -124,7 +125,13 @@ class Agent:
             for tc in response.tool_calls:
                 yield {"type": "tool_call", "name": tc.name, "args": tc.args}
 
-                result = self.registry.dispatch(tc.name, tc.args, working_dir=self.working_dir)
+                # Run dispatch on a worker thread so blocking subprocess.wait
+                # calls in tools/terminal.py and tools/pyth_deploy.py don't
+                # freeze the event loop (which kills uvicorn's WS ping and
+                # manifests as a silent mid-tool-call disconnect).
+                result = await asyncio.to_thread(
+                    self.registry.dispatch, tc.name, tc.args, working_dir=self.working_dir,
+                )
 
                 # Truncate oversized results
                 if len(result) > MAX_TOOL_RESULT_CHARS:
@@ -134,6 +141,19 @@ class Agent:
                         + f"\n\n[Truncated: tool response was {original_len:,} chars, "
                         f"exceeding the {MAX_TOOL_RESULT_CHARS:,} char limit]"
                     )
+
+                # Append tool_msg BEFORE yielding tool_result so the WS
+                # handler's save (triggered by the tool_result event) sees
+                # the message. Previously yield happened first, so a
+                # disconnect during send_json lost the tool_msg forever.
+                tool_msg = {
+                    "role": "tool",
+                    "content": result,
+                    "tool_call_id": tc.id,
+                    "timestamp": _now(),
+                }
+                messages.append(tool_msg)
+                history.append(tool_msg)
 
                 yield {"type": "tool_result", "name": tc.name, "result": result}
 
@@ -147,15 +167,6 @@ class Agent:
                             yield {"type": "self_correcting", "error": stderr.strip()}
                     except (json.JSONDecodeError, TypeError):
                         pass
-
-                tool_msg = {
-                    "role": "tool",
-                    "content": result,
-                    "tool_call_id": tc.id,
-                    "timestamp": _now(),
-                }
-                messages.append(tool_msg)
-                history.append(tool_msg)
 
             iteration += 1
 

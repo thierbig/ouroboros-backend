@@ -9,7 +9,7 @@ from core.tools import create_tool_registry
 from core.adapters.anthropic import AnthropicAdapter
 from core.adapters.openai import OpenAIAdapter
 from core.pricing import calculate_cost
-from db.models import create_session, update_session_status, update_session_messages, add_chunk
+from db.models import create_session, update_session_status, update_session_messages, add_chunk, mark_disconnected
 from tools.terminal import set_stream_callback
 
 router = APIRouter()
@@ -192,10 +192,12 @@ async def agent_websocket(ws: WebSocket):
                     await ws.send_json({"type": "done"})
 
                 except WebSocketDisconnect:
-                    # Client left mid-stream — save what we have and exit cleanly
+                    # Client left mid-stream — save what we have, label the
+                    # session as "disconnected" (NOT "completed") so the
+                    # analyzer can tell interrupted runs from clean finishes.
                     if session_id:
                         await update_session_messages(session_id, messages_history)
-                        await update_session_status(session_id, "completed", total_tokens=total_tokens, total_cost=total_cost)
+                        await mark_disconnected(session_id, total_tokens=total_tokens, total_cost=total_cost)
                     raise  # Re-raise to break the outer while loop
                 except Exception as e:
                     try:
@@ -209,9 +211,12 @@ async def agent_websocket(ws: WebSocket):
                     set_stream_callback(None)
 
     except WebSocketDisconnect:
+        # mark_disconnected is a no-op if the session already reached a
+        # terminal state (completed/error) in the inner handler, so a late
+        # client close after a clean turn doesn't clobber the real status.
         if session_id:
             await update_session_messages(session_id, messages_history)
-            await update_session_status(session_id, "completed", total_tokens=total_tokens, total_cost=total_cost)
+            await mark_disconnected(session_id, total_tokens=total_tokens, total_cost=total_cost)
     except Exception as e:
         try:
             await ws.send_json({"type": "error", "message": str(e)})
