@@ -13,30 +13,50 @@ router = APIRouter()
 PROJECTS_DIR = os.environ.get("PROJECTS_DIR", str(Path(__file__).parent.parent / "demos"))
 
 
-def _detect_deploy_url(project_dir: Path) -> str | None:
-    """Check if a project has been deployed to Netlify."""
-    # Check lessons.md for deploy URL
+_NETLIFY_URL_RE = re.compile(r'https://[a-zA-Z0-9-]+\.netlify\.app')
+
+
+async def _detect_deploy_url_from_sessions(working_dir: str) -> str | None:
+    """Scan recent sessions for a netlify.app URL — take the most recent mention."""
+    try:
+        from db.connection import get_database
+        db = await get_database()
+        sessions = await db.sessions.find(
+            {"working_dir": working_dir, "hidden": {"$ne": True}},
+            sort=[("created_at", -1)],
+        ).to_list(20)
+        for s in sessions:
+            for msg in reversed(s.get("messages", [])):
+                content = msg.get("content", "") or ""
+                match = _NETLIFY_URL_RE.search(content)
+                if match:
+                    return match.group(0)
+    except Exception:
+        pass
+    return None
+
+
+def _detect_deploy_url_from_files(project_dir: Path) -> str | None:
+    """Fallback: check lessons.md for a deploy URL."""
     lessons = project_dir / "tasks" / "lessons.md"
     if lessons.exists():
         try:
             text = lessons.read_text(encoding="utf-8", errors="replace")
-            match = re.search(r'https://[a-zA-Z0-9-]+\.netlify\.app', text)
+            match = _NETLIFY_URL_RE.search(text)
             if match:
                 return match.group(0)
         except Exception:
             pass
-    # Check .netlify/state.json for site name
-    state = project_dir / ".netlify" / "state.json"
-    if state.exists():
-        try:
-            import json
-            data = json.loads(state.read_text())
-            site_id = data.get("siteId", "")
-            if site_id:
-                return f"https://{project_dir.name}.netlify.app"
-        except Exception:
-            pass
     return None
+
+
+async def _detect_deploy_url(project_dir: Path) -> str | None:
+    """Resolve the actual deployed URL — prefer recent session messages over files."""
+    working_dir = str(project_dir.resolve())
+    url = await _detect_deploy_url_from_sessions(working_dir)
+    if url:
+        return url
+    return _detect_deploy_url_from_files(project_dir)
 
 
 async def _find_deploy_session(working_dir: str, deploy_url: str) -> str | None:
@@ -101,7 +121,7 @@ async def list_projects():
             actual_files = {f.name for f in entry.iterdir() if not f.name.startswith(".")}
             has_code = bool(actual_files - scaffold_only)
 
-            deploy_url = _detect_deploy_url(entry)
+            deploy_url = await _detect_deploy_url(entry)
             deploy_session_id = None
             if deploy_url:
                 deploy_session_id = await _find_deploy_session(str(entry.resolve()), deploy_url)
@@ -501,7 +521,7 @@ async def showcase_projects():
     for entry in sorted(projects_path.iterdir()):
         if not entry.is_dir() or entry.name.startswith("."):
             continue
-        deploy_url = _detect_deploy_url(entry)
+        deploy_url = await _detect_deploy_url(entry)
         if not deploy_url:
             continue
         deploy_session_id = await _find_deploy_session(str(entry.resolve()), deploy_url)
@@ -554,7 +574,7 @@ async def showcase_get_session(session_id: str):
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     project_dir = _project_dir_for_session(session.get("working_dir", ""))
-    if not project_dir or not project_dir.exists() or not _detect_deploy_url(project_dir):
+    if not project_dir or not project_dir.exists() or not await _detect_deploy_url(project_dir):
         raise HTTPException(status_code=404, detail="Session not available")
     return serialize_doc(session)
 
@@ -566,7 +586,7 @@ async def showcase_get_chunks(session_id: str):
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     project_dir = _project_dir_for_session(session.get("working_dir", ""))
-    if not project_dir or not project_dir.exists() or not _detect_deploy_url(project_dir):
+    if not project_dir or not project_dir.exists() or not await _detect_deploy_url(project_dir):
         raise HTTPException(status_code=404, detail="Session not available")
     chunks = await get_chunks_for_session(session_id)
     return [serialize_doc(c) for c in chunks]
